@@ -35,6 +35,40 @@ Cloudflare Web Analytics counts visits without cookies.
 4. At the bottom of `index.html`, replace `YOUR_CLOUDFLARE_TOKEN` with that token and remove the `<!--` and `-->` lines around the script tag.
 5. Commit and push. Visits show up in Cloudflare within a few minutes.
 
+## Publishing changes
+
+After the one-time sign-in below, publish from this folder with:
+
+```
+bash publish.sh "what changed"
+```
+
+Add a short entry to `RELEASE_NOTES.md` first so the history stays up to date. The site updates about a minute after the push.
+
+## Sign in to GitHub once (works for every future site)
+
+GitHub CLI signs Terminal in once and remembers it, including accounts that use Google sign-in.
+
+1. Install it: `brew install gh` (if you do not have Homebrew, get it from https://brew.sh first).
+2. Run `gh auth login`.
+3. Choose GitHub.com, then HTTPS, then "Yes" to authenticate Git with your GitHub credentials, then "Login with a web browser".
+4. Copy the one-time code shown, press Return, and approve in the browser.
+5. Check with `gh auth status`.
+
+## Starting another site later
+
+From the new project's folder:
+
+```
+git init -b main
+git add .
+git commit -m "First version"
+gh repo create NAME --public --source=. --push
+gh api -X POST repos/kawai-projects/NAME/pages -f "source[branch]=main" -f "source[path]=/"
+```
+
+Replace NAME with the repository name. The site appears at https://kawai-projects.github.io/NAME/ after about a minute.
+
 ## Notes
 
 - Save remix records the mix in the browser and saves an MP3. If the MP3 encoder cannot load, it saves MP4 or WebM instead, depending on what the browser can record.

@@ -356,7 +356,7 @@ footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
 
   <div class="tracks" id="tracks"></div>
 
-  <footer>Every sound is made in your browser. Audio you add stays on your device.</footer>
+  <footer>Every sound is made in your browser. Audio you add stays on your device.<br>Version 1.1.0 &middot; <a href="https://github.com/kawai-projects/mochi-mixer/blob/main/RELEASE_NOTES.md">Release notes</a></footer>
 </main>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -538,8 +538,8 @@ function wake(){
   return actx.resume().catch(()=>{});
 }
 function sliceStart(t,i){
-  const d=t.dur,chop=Math.min(state.chop,d);
-  return clamp((i+state.spot)*d/4,0,Math.max(0,d-chop));
+  const d=t.dur;
+  return clamp((i+state.spot)*d/4,0,Math.max(0,d-.05));
 }
 function trigger(t,val,when){
   if(!actx||!t.buffer||!t.in)return;
@@ -650,7 +650,7 @@ function buildTrack(t,i){
       +'<div class="x-side">'
       +'<p class="fname"><span>Now chopping</span><strong class="fn">Demo ditty</strong></p>'
       +'<div class="x-btns"><button type="button" class="soft up">Swap in your sound</button><button type="button" class="ghost demo">Use demo</button></div>'
-      +'<label class="knob"><span class="k-top"><span>Chop length</span><output data-o="chop"></output></span><input type="range" data-x="chop" min="10" max="2000" step="5" value="45" aria-label="Chop length"></label>'
+      +'<label class="knob"><span class="k-top"><span>Chop length</span><output data-o="chop"></output></span><input type="range" data-x="chop" min="0" max="1000" step="1" value="500" aria-label="Chop length, far right is the whole song"></label>'
       +'<label class="knob"><span class="k-top"><span>Slice spot</span><output data-o="spot"></output></span><input type="range" data-x="spot" min="0" max="90" step="1" value="0" aria-label="Slice spot"></label>'
       +'<input type="file" id="file" accept="audio/*" hidden>'
       +'</div></div>';
@@ -718,11 +718,29 @@ function syncDeck(){
   if(actx&&delayNode)delayNode.delayTime.setTargetAtTime(echoTime(),actx.currentTime,.05);
   touchShare();
 }
+/* chop length: slider position 0..1000 on a log scale from 0.1s up to the whole song */
+const CHOP_MIN=.1;
+function chopFromPos(p){
+  const d=sampleTrack.dur;
+  if(d<=CHOP_MIN*1.5||p>=1000)return d;
+  return CHOP_MIN*Math.pow(d/CHOP_MIN,p/1000);
+}
+function posFromChop(c){
+  const d=sampleTrack.dur;
+  if(d<=CHOP_MIN*1.5||c>=d-.005)return 1000;
+  return clamp(Math.round(Math.log(Math.max(c,CHOP_MIN)/CHOP_MIN)/Math.log(d/CHOP_MIN)*1000),0,999);
+}
+function fmtChop(c){
+  const d=sampleTrack.dur;
+  if(c>=d-.005)return 'Whole song';
+  if(c>=60){const m=Math.floor(c/60),sec=Math.round(c%60);return m+':'+(sec<10?'0':'')+sec}
+  return c.toFixed(c<10?2:1)+'s';
+}
 function syncChop(){
-  const c=Math.round(state.chop*100),s=Math.round(state.spot*100);
+  const s=Math.round(state.spot*100);
   const ci=$('input[data-x="chop"]',sampleTrack.el),si=$('input[data-x="spot"]',sampleTrack.el);
-  setRange(ci,c);setRange(si,s);
-  $('output[data-o="chop"]',sampleTrack.el).textContent=fmt('chop',c);
+  setRange(ci,posFromChop(state.chop));setRange(si,s);
+  $('output[data-o="chop"]',sampleTrack.el).textContent=fmtChop(state.chop);
   $('output[data-o="spot"]',sampleTrack.el).textContent=s+'%';
 }
 let lastNow=-1;
@@ -863,7 +881,7 @@ tracksEl.addEventListener('input',e=>{
     setRange(r,v);$('output[data-o="'+k+'"]',t.el).textContent=fmt(k,v);
     applyTrackAudio(t);
   }else if(r.dataset.x==='chop'){
-    state.chop=v/100;setRange(r,v);$('output[data-o="chop"]',sampleTrack.el).textContent=fmt('chop',v);drawWave();
+    state.whole=v>=1000;state.chop=chopFromPos(v);setRange(r,v);$('output[data-o="chop"]',sampleTrack.el).textContent=fmtChop(state.chop);drawWave();
   }else if(r.dataset.x==='spot'){
     state.spot=v/100;setRange(r,v);$('output[data-o="spot"]',sampleTrack.el).textContent=v+'%';drawWave();
   }
@@ -1084,7 +1102,7 @@ function drawWave(){
   const d=t.dur,chop=Math.min(state.chop,d);
   g.textBaseline='top';g.font='600 12px Fredoka, system-ui, sans-serif';
   for(let i=0;i<4;i++){
-    const s=sliceStart(t,i),x0=s/d*w,x1=Math.max(x0+8,(s+chop)/d*w);
+    const s=sliceStart(t,i),x0=s/d*w,x1=Math.min(w,Math.max(x0+8,(s+Math.min(chop,d-s))/d*w));
     g.globalAlpha=.6;g.fillStyle=sky;rr(g,x0,0,x1-x0,h,8);g.fill();
     g.globalAlpha=1;g.fillStyle=ink;g.fillText(String(i+1),x0+5,3);
   }
@@ -1098,9 +1116,7 @@ function drawWave(){
   g.globalAlpha=1;
 }
 function updateChopRange(){
-  const t=sampleTrack,mx=clamp(Math.floor(t.dur*20)*5,20,2000);
-  $('input[data-x="chop"]',t.el).max=String(mx);
-  if(state.chop*100>mx)state.chop=mx/100;
+  if(state.whole||state.chop>sampleTrack.dur)state.chop=sampleTrack.dur;
   syncChop();
 }
 function setSample(pcm,sr,buf,name){

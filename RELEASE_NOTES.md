@@ -6,6 +6,12 @@ Newest version first. Add a new section at the top each time you publish a chang
 
 Nothing yet.
 
+## 1.1.0 (2026-10-28)
+
+### Changed
+- The Chop length slider now goes all the way up to the whole song. The far right end reads "Whole song". The slider is finer at short lengths and covers the full range of long songs.
+- Each of the four slices now starts at its own quarter of the song and plays for the chop length, or until the song ends. At "Whole song", slice 1 plays the entire song and slice 2 plays from the quarter point to the end.
+
 ## 1.0.0 (2026-10-28)
 
 First public release, live on GitHub Pages at https://kawai-projects.github.io/mochi-mixer/
