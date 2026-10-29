@@ -1,9 +1,7 @@
-# Mochi Mixer project notes
+# Mochi Mixer: working rules
 
-## Versioning (do this on every change to the site)
-
-- Bump the version in the footer of `index.html` ("Version X.Y.Z").
-- Add a matching section at the top of `RELEASE_NOTES.md`: `## X.Y.Z (YYYY-MM-DD)`, with Added, Changed or Fixed lists in plain words.
-- Patch (1.1.1) for small fixes, minor (1.2.0) for new features, major (2.0.0) for big changes.
-- The owner publishes from Terminal with `bash publish.sh "message"`. That script also creates the GitHub Release for the version in the footer, using that version's section of `RELEASE_NOTES.md`.
-- Only edit files in this folder. Do not run git commands here from the cloud session.
+- The whole site is one file, `index.html`. No build step.
+- Every change bumps the version in the page footer ("Version X.Y.Z"): patch for small fixes, minor for new features, major for big changes. Tell the user the new number.
+- There are no release notes. `publish.sh` uses the commit message as the GitHub Release text.
+- Show every change to the user as a preview in the canvas (the Claude artifact) and wait for approval before saving it to the Mac folder or telling them to publish.
+- Only edit files here. The user publishes from Terminal with `bash publish.sh "what changed"`.

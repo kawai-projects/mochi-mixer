@@ -43,7 +43,9 @@ After the one-time sign-in below, publish from this folder with:
 bash publish.sh "what changed"
 ```
 
-Add a short entry to `RELEASE_NOTES.md` first so the history stays up to date. The site updates about a minute after the push.
+The script commits and pushes everything, then creates a GitHub Release for the version shown in the page footer, using your message as the release text. Every change gets a new version number in the footer of `index.html`. The site updates about a minute after the push.
+
+Version numbers: patch (1.1.1) for small fixes, minor (1.2.0) for new features, major (2.0.0) for big changes.
 
 ## Sign in to GitHub once (works for every future site)
 
@@ -71,6 +73,6 @@ Replace NAME with the repository name. The site appears at https://kawai-project
 
 ## Notes
 
-- Save remix records the mix in the browser and saves an MP3. If the MP3 encoder cannot load, it saves MP4 or WebM instead, depending on what the browser can record.
+- Save remix records the mix in the browser and always saves an MP3. If the MP3 encoder cannot load from the web, it saves an uncompressed WAV instead, never a video format.
 - The Share link stores the beat, tempo, flavor and muted tracks in the address after the `#`. A sound you add yourself is not included, so the demo sound plays in that slot.
 - Fonts (Bagel Fat One and Fredoka) load from Google Fonts. The MP3 encoder (lamejs) loads from cdnjs.

@@ -10,7 +10,6 @@
 <meta property="og:description" content="A pastel step sequencer where mochi characters play synth sounds or chops of your own audio. Remix beats, save them, and share a link.">
 <meta name="theme-color" content="#FFF0F6">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M60 12C94 12 114 38 114 68C114 92 94 104 60 104C26 104 6 92 6 68C6 38 26 12 60 12Z' fill='%23FF86B7' stroke='%23D9528B' stroke-width='6'/%3E%3Ccircle cx='42' cy='62' r='7' fill='%233B2146'/%3E%3Ccircle cx='78' cy='62' r='7' fill='%233B2146'/%3E%3C/svg%3E">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -124,6 +123,14 @@ h1,h2,p{margin:0}
 .remix:hover{transform:translateY(-2px) rotate(-2deg);box-shadow:0 8px 0 var(--butter-d)}
 .remix:active{transform:translateY(4px);box-shadow:0 2px 0 var(--butter-d)}
 .remix svg{width:28px;height:28px}
+#howto{border:0;padding:0;background:transparent;max-width:min(560px,calc(100vw - 32px));width:100%;color:var(--ink)}
+#howto::backdrop{background:rgba(59,33,70,.45)}
+.ht-card{background:var(--card);border:4px solid var(--line);border-radius:28px;padding:22px 22px 20px;box-shadow:0 14px 0 -6px var(--line);max-height:calc(100vh - 48px);overflow:auto}
+.ht-card h2{margin:0 0 12px;font-family:'Bagel Fat One','Fredoka',system-ui,sans-serif;font-weight:400;font-size:30px;line-height:1.1}
+.ht-list{list-style:none;counter-reset:ht;margin:0 0 16px;padding:0;display:grid;gap:12px}
+.ht-list li{counter-increment:ht;position:relative;padding-left:44px;line-height:1.4;font-size:16px}
+.ht-list li::before{content:counter(ht);position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;background:var(--pink);border:3px solid var(--pink-d);color:var(--on-accent);display:grid;place-items:center;font-weight:700;font-size:15px}
+.howto-btn{justify-self:start}
 .ghost{
   background:transparent;border:3px solid var(--line);border-radius:999px;
   padding:7px 16px;font-weight:600;font-size:14px;color:var(--ink-soft);
@@ -148,11 +155,15 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   box-shadow:0 5px 0 var(--line),0 22px 40px -28px var(--shadow);
   padding:14px 18px 16px;
   display:grid;gap:12px 22px;align-items:center;
-  grid-template-columns:210px minmax(0,1fr) 250px;
+  grid-template-columns:230px minmax(0,1fr) 250px;
   grid-template-areas:"head steps knobs" "extras extras extras";
 }
-.t-head{grid-area:head;display:flex;align-items:center;gap:12px;min-width:0}
-.mochi-wrap{flex:none;width:92px}
+.t-head{grid-area:head;display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"mochi" "name" "sub" "mute";gap:6px;justify-items:center;text-align:center;min-width:0}
+.mochi-wrap{grid-area:mochi;width:92px}
+.t-side{display:contents}
+.t-head .mute{grid-area:mute;margin-top:4px}
+.t-name{grid-area:name;min-width:0}
+.t-sub{grid-area:sub;font-size:13px;line-height:1.3;color:var(--ink-soft);white-space:nowrap}
 .mochi{width:100%;height:auto;display:block;overflow:visible;transform-origin:50% 92%}
 .ac{fill:var(--c);stroke:var(--cd);stroke-width:4;stroke-linejoin:round}
 .m-breathe{animation:breathe 2.6s ease-in-out infinite alternate;animation-delay:var(--d,0s);transform-box:fill-box;transform-origin:50% 100%}
@@ -179,9 +190,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   15%{opacity:1}
   100%{opacity:0;transform:translate(16px,-38px) scale(1.25) rotate(10deg)}
 }
-.t-name{min-width:0;flex:1}
+.t-name{min-width:0}
 .t-name h2{font-family:var(--font-display);font-weight:400;font-size:22px;line-height:1.1}
-.t-name p{font-size:13px;color:var(--ink-soft)}
 .mute{
   flex:none;background:var(--well);border:3px solid var(--line);border-radius:999px;
   padding:4px 12px;font-weight:600;font-size:13px;
@@ -207,15 +217,34 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .track .knob{--c:var(--tc);--cd:var(--tcd)}
 
 .extras{
-  grid-area:extras;display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,320px);gap:16px;align-items:center;
+  grid-area:extras;display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,320px);gap:16px 22px;align-items:start;
   background:var(--well);border-radius:22px;padding:12px 14px;
 }
-.wave-box{min-width:0}
-canvas.wave{display:block;width:100%;height:72px}
-.x-side{display:grid;gap:6px;min-width:0}
+.wave-box{min-width:0;display:grid;gap:10px}
+.x-label{font-size:14px;color:var(--ink-soft)}
+canvas.wave{display:block;width:100%;height:96px;border-radius:14px;background:var(--well-2);cursor:grab;touch-action:none}
+canvas.wave.dragging{cursor:grabbing}
+.sel-info{font-size:15px;font-weight:500}
+.len-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.len-chip{
+  border:3px solid var(--line);background:var(--card);border-radius:999px;
+  padding:3px 12px;font-weight:600;font-size:14px;color:var(--ink);
+}
+.len-chip.long{opacity:.6}
+.len-chip:hover{border-color:var(--cd)}
+.len-chip[aria-pressed="true"]{background:var(--c);border-color:var(--cd);color:var(--on-accent)}
+.x-side{display:grid;gap:14px;min-width:0}
 .fname{display:grid;font-size:13px;color:var(--ink-soft);min-width:0}
 .fname strong{color:var(--ink);font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .x-btns{display:flex;flex-wrap:wrap;gap:8px}
+fieldset.seg{border:0;padding:0;margin:0;min-width:0}
+fieldset.seg legend{padding:0;margin-bottom:6px;font-size:14px;color:var(--ink-soft)}
+.seg-row{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative;display:block}
+.seg input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.seg span{display:block;border:3px solid var(--line);background:var(--card);border-radius:999px;padding:5px 14px;font-weight:600;font-size:14px}
+.seg input:checked + span{background:var(--c);border-color:var(--cd);color:var(--on-accent)}
+.seg input:focus-visible + span{outline:3px solid var(--ink);outline-offset:2px}
 .soft{
   background:var(--c);color:var(--on-accent);border:0;border-radius:999px;
   padding:9px 16px;font-weight:600;font-size:14px;box-shadow:0 4px 0 var(--cd);
@@ -237,6 +266,7 @@ canvas.wave{display:block;width:100%;height:72px}
 .pill:disabled{cursor:progress;transform:none;box-shadow:0 5px 0 var(--cd)}
 .pill svg{width:20px;height:20px;flex:none}
 .pill-mint{--c:var(--mint);--cd:var(--mint-d)}
+.pill-pink{--c:var(--pink);--cd:var(--pink-d)}
 .pill-lav{--c:var(--lav);--cd:var(--lav-d)}
 .recdot{width:12px;height:12px;border-radius:50%;background:#E8336D;flex:none;animation:recblink .8s ease-in-out infinite}
 @keyframes recblink{0%,100%{opacity:1}50%{opacity:.25}}
@@ -273,7 +303,7 @@ footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
 #toast.show{transform:translate(-50%,0);opacity:1}
 
 @media (max-width:980px){
-  .track{grid-template-columns:200px minmax(0,1fr);grid-template-areas:"head steps" "knobs knobs" "extras extras"}
+  .track{grid-template-columns:230px minmax(0,1fr);grid-template-areas:"head steps" "knobs knobs" "extras extras"}
   .knobs{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 @media (max-width:760px){
@@ -301,8 +331,30 @@ footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
 <main class="app">
   <header class="hero">
     <h1 class="title" id="title" aria-label="Mochi Mixer"></h1>
-    <p class="tag">Press play and tap the squares to place sounds. Hit Remix for a fresh beat. Drop your own audio on the blue mochi to chop it up.</p>
+    <p class="tag">Press play and tap the squares to place sounds. Hit Remix for a fresh beat. Swap in your own audio on the blue mochi to chop it up.</p>
+    <p><button type="button" class="pill pill-lav howto-btn" id="howtoBtn" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M9.5 9.5a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.1.9-1.1 1.7M12 16.6v.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      How to play
+    </button></p>
   </header>
+
+  <dialog id="howto" aria-labelledby="howtoTitle">
+    <div class="ht-card">
+      <h2 id="howtoTitle">How to play</h2>
+      <ol class="ht-list">
+        <li><b>Press play.</b> Tap the big round button. Sound starts after your first tap.</li>
+        <li><b>Tap the squares.</b> Each row belongs to one mochi. Tap a square to place a sound, and tap it again on the Bell Bun, Pudding Pluck and Your Sound rows to change the note.</li>
+        <li><b>Pick a flavor.</b> Strawberry, Matcha, Taro and Mango change the tempo, swing and musical scale.</li>
+        <li><b>Hit Remix!</b> Get a fresh beat in that flavor. Not happy? Tap Remix again, or Clear all squares to start empty.</li>
+        <li><b>Shape each mochi.</b> Use Loud, Pitch, Echo and Muffle on every row. Press a mochi's mute button and it falls asleep.</li>
+        <li><b>Add your own sound.</b> On Your Sound, press Swap in your sound and pick a song or drop a file. Drag the glowing box on the wave to choose which part to use, and tap a length like 2 s or Whole song.</li>
+        <li><b>Choose what a blue square plays.</b> One of 4 pieces cuts your part into four numbered pieces. All of it plays the whole part on every square.</li>
+        <li><b>Save it as an MP3.</b> Pick how many loops, press Save remix, and keep the page open while it records. The MP3 downloads to your device.</li>
+        <li><b>Share it.</b> Press Share to copy a link that rebuilds your beat, tempo, flavor and sleeping mochi. A sound you added yourself is not in the link.</li>
+      </ol>
+      <button type="button" class="pill pill-pink ht-close" id="howtoClose">Got it, let's mix!</button>
+    </div>
+  </dialog>
 
   <section class="deck" aria-label="Controls">
     <button class="play" id="play" type="button" aria-pressed="false" aria-label="Play">
@@ -356,7 +408,7 @@ footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
 
   <div class="tracks" id="tracks"></div>
 
-  <footer>Every sound is made in your browser. Audio you add stays on your device.<br>Version 1.1.0 &middot; <a href="https://github.com/kawai-projects/mochi-mixer/blob/main/RELEASE_NOTES.md">Release notes</a></footer>
+  <footer>Every sound is made in your browser. Audio you add stays on your device.<br>Version 1.3.4</footer>
 </main>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -455,7 +507,7 @@ const DEFS=[
 ];
 
 /* ---------- state ---------- */
-const state={playing:false,bpm:112,swing:.14,master:.8,scale:'major',flavor:'strawberry',chop:.45,spot:0,remixCount:0};
+const state={playing:false,bpm:112,swing:.14,master:.8,scale:'major',flavor:'strawberry',selStart:0,selEnd:0,mode:'pieces',remixCount:0};
 const tracks=DEFS.map(d=>Object.assign({},d,{sr:SR,dur:d.pcm.length/SR,steps:new Array(16).fill(0),mute:false,els:{},buffer:null,in:null,lp:null,send:null}));
 const sampleTrack=tracks[5];
 sampleTrack.fileName='Demo ditty';
@@ -537,22 +589,25 @@ function wake(){
   if(actx.state==='running')return Promise.resolve();
   return actx.resume().catch(()=>{});
 }
-function sliceStart(t,i){
-  const d=t.dur;
-  return clamp((i+state.spot)*d/4,0,Math.max(0,d-.05));
+/* the part of the sound in use is cut into 4 pieces, or every square plays all of it */
+function pieceFor(val){
+  const len=state.selEnd-state.selStart;
+  if(state.mode==='whole')return{off:state.selStart,len:len};
+  const p=len/4;
+  return{off:state.selStart+(val-1)*p,len:p};
 }
-function trigger(t,val,when){
+function trigger(t,val,when,maxLen){
   if(!actx||!t.buffer||!t.in)return;
   const semis=t.pitch+(t.kind==='melody'?SCALES[state.scale][val-1]:0);
   const rate=Math.pow(2,semis/12);
   const src=actx.createBufferSource();src.buffer=t.buffer;src.playbackRate.value=rate;
   const g=actx.createGain();src.connect(g);
   if(t.kind==='sample'){
-    /* long chops cut each other off so they do not pile up */
+    /* long pieces cut each other off so they do not pile up */
     const choke=actx.createGain();g.connect(choke);choke.connect(t.in);
     if(t.voice){try{t.voice.gain.setValueAtTime(1,when);t.voice.gain.linearRampToValueAtTime(0,when+.03)}catch(e){}}
     t.voice=choke;
-    const d=t.dur,chop=Math.min(state.chop,d),off=sliceStart(t,val-1),len=Math.min(chop,d-off),pl=len/rate;
+    const pc=pieceFor(val),off=pc.off,len=Math.max(.02,Math.min(pc.len,t.dur-off,maxLen||1e9)),pl=len/rate;
     g.gain.setValueAtTime(0,when);
     g.gain.linearRampToValueAtTime(1,when+.01);
     g.gain.setValueAtTime(1,when+Math.max(.012,pl-.04));
@@ -646,19 +701,27 @@ function buildTrack(t,i){
   let extras='';
   if(t.kind==='sample'){
     extras='<div class="extras">'
-      +'<div class="wave-box"><canvas class="wave" role="img" aria-label="Waveform of the current sound with four numbered chop slices"></canvas></div>'
+      +'<div class="wave-box">'
+      +'<p class="x-label">Drag the glowing box along the wave to pick which part of the sound to use.</p>'
+      +'<canvas class="wave" tabindex="0" role="img" aria-label="Waveform of the sound. The highlighted box is the part in use. Press the left and right arrow keys to move it."></canvas>'
+      +'<p class="sel-info"></p>'
+      +'<div><p class="x-label">How long a part?</p><div class="len-chips" role="group" aria-label="Length of the part in use"></div></div>'
+      +'</div>'
       +'<div class="x-side">'
-      +'<p class="fname"><span>Now chopping</span><strong class="fn">Demo ditty</strong></p>'
+      +'<p class="fname"><span>Sound in use</span><strong class="fn">Demo ditty</strong></p>'
       +'<div class="x-btns"><button type="button" class="soft up">Swap in your sound</button><button type="button" class="ghost demo">Use demo</button></div>'
-      +'<label class="knob"><span class="k-top"><span>Chop length</span><output data-o="chop"></output></span><input type="range" data-x="chop" min="0" max="1000" step="1" value="500" aria-label="Chop length, far right is the whole song"></label>'
-      +'<label class="knob"><span class="k-top"><span>Slice spot</span><output data-o="spot"></output></span><input type="range" data-x="spot" min="0" max="90" step="1" value="0" aria-label="Slice spot"></label>'
+      +'<fieldset class="seg"><legend>Each blue square plays</legend><div class="seg-row">'
+      +'<label><input type="radio" name="playmode" value="pieces" checked><span>One of 4 pieces</span></label>'
+      +'<label><input type="radio" name="playmode" value="whole"><span>All of it</span></label>'
+      +'</div></fieldset>'
       +'<input type="file" id="file" accept="audio/*" hidden>'
       +'</div></div>';
   }
   sec.innerHTML=
     '<div class="t-head"><div class="mochi-wrap">'+mochiSVG(t,i)+'</div>'
-    +'<div class="t-name"><h2>'+t.name+'</h2><p>'+t.sub+'</p></div>'
+    +'<div class="t-side"><div class="t-name"><h2>'+t.name+'</h2></div>'
     +'<button type="button" class="mute" aria-pressed="false" aria-label="Mute '+t.name+'">Mute</button></div>'
+    +'<p class="t-sub">'+t.sub.charAt(0).toUpperCase()+t.sub.slice(1)+'</p></div>'
     +'<div class="steps" role="group" aria-label="'+t.name+' steps">'+stepsHTML+'</div>'
     +'<div class="knobs">'
       +knobHTML('vol','Loud',0,100,Math.round(t.vol*100),'%',t)
@@ -671,7 +734,7 @@ function buildTrack(t,i){
   t.els.mochi=$('.mochi',sec);
   t.els.steps=Array.prototype.slice.call(sec.querySelectorAll('.step'));
   t.els.armL=$('.arm-l',sec);t.els.armR=$('.arm-r',sec);
-  if(t.kind==='sample'){t.els.wave=$('canvas.wave',sec);t.els.fn=$('.fn',sec);}
+  if(t.kind==='sample'){t.els.wave=$('canvas.wave',sec);t.els.fn=$('.fn',sec);t.els.info=$('.sel-info',sec);t.els.chips=$('.len-chips',sec);}
 }
 tracks.forEach(buildTrack);
 
@@ -718,30 +781,67 @@ function syncDeck(){
   if(actx&&delayNode)delayNode.delayTime.setTargetAtTime(echoTime(),actx.currentTime,.05);
   touchShare();
 }
-/* chop length: slider position 0..1000 on a log scale from 0.1s up to the whole song */
-const CHOP_MIN=.1;
-function chopFromPos(p){
-  const d=sampleTrack.dur;
-  if(d<=CHOP_MIN*1.5||p>=1000)return d;
-  return CHOP_MIN*Math.pow(d/CHOP_MIN,p/1000);
+/* ---------- the part of the sound in use ---------- */
+const MIN_SEL=.2,CHIP_LENS=[1,2,4,8,16,30];
+function fmtDur(s){
+  if(s<10)return s.toFixed(1)+' s';
+  if(s<60)return Math.round(s)+' s';
+  let m=Math.floor(s/60),r=Math.round(s-m*60);
+  if(r===60){m++;r=0}
+  return m+' min '+r+' s';
 }
-function posFromChop(c){
-  const d=sampleTrack.dur;
-  if(d<=CHOP_MIN*1.5||c>=d-.005)return 1000;
-  return clamp(Math.round(Math.log(Math.max(c,CHOP_MIN)/CHOP_MIN)/Math.log(d/CHOP_MIN)*1000),0,999);
+function fmtPos(s){
+  if(sampleTrack.dur<60)return s.toFixed(1)+' s';
+  const m=Math.floor(s/60),r=Math.floor(s%60);
+  return m+':'+(r<10?'0':'')+r;
 }
-function fmtChop(c){
-  const d=sampleTrack.dur;
-  if(c>=d-.005)return 'Whole song';
-  if(c>=60){const m=Math.floor(c/60),sec=Math.round(c%60);return m+':'+(sec<10?'0':'')+sec}
-  return c.toFixed(c<10?2:1)+'s';
+/* default part: the liveliest 2 seconds (or everything, for a short sound) */
+function autoPick(){
+  const t=sampleTrack,d=t.dur;
+  if(d<=4){state.selStart=0;state.selEnd=d;return;}
+  const win=2,bins=t.peaks.length,per=d/bins,k=Math.max(1,Math.round(win/per));
+  let best=0,bestSum=-1,sum=0;
+  for(let i=0;i<bins;i++){
+    sum+=t.peaks[i];if(i>=k)sum-=t.peaks[i-k];
+    if(i>=k-1&&sum>bestSum){bestSum=sum;best=i-k+1;}
+  }
+  const s=clamp(best*per,0,d-win);
+  state.selStart=s;state.selEnd=s+win;
 }
-function syncChop(){
-  const s=Math.round(state.spot*100);
-  const ci=$('input[data-x="chop"]',sampleTrack.el),si=$('input[data-x="spot"]',sampleTrack.el);
-  setRange(ci,posFromChop(state.chop));setRange(si,s);
-  $('output[data-o="chop"]',sampleTrack.el).textContent=fmtChop(state.chop);
-  $('output[data-o="spot"]',sampleTrack.el).textContent=s+'%';
+function buildChips(){
+  const box=sampleTrack.els.chips,d=sampleTrack.dur;
+  box.textContent='';
+  CHIP_LENS.forEach(v=>{
+    const b=document.createElement('button');b.type='button';b.className='len-chip'+(v>=d-.05?' long':'');
+    if(v>=d-.05)b.title='Your sound is shorter than this, so it uses all of it';b.dataset.len=String(v);b.textContent=v+' s';
+    box.appendChild(b);
+  });
+  const all=document.createElement('button');all.type='button';all.className='len-chip';all.dataset.len='all';all.textContent='Whole song';
+  box.appendChild(all);
+}
+function syncSel(){
+  const t=sampleTrack,d=t.dur,len=state.selEnd-state.selStart,whole=len>=d-.01;
+  const a=whole?('Using the whole sound, '+fmtDur(d)+' long.'):('Using '+fmtPos(state.selStart)+' to '+fmtPos(state.selEnd)+', '+fmtDur(len)+' long.');
+  const b=state.mode==='whole'?' Every blue square plays all of it.':(' Each blue square plays one piece of '+fmtDur(len/4)+'.');
+  t.els.info.textContent=a+b;
+  t.els.chips.querySelectorAll('.len-chip').forEach(ch=>{
+    const all=ch.dataset.len==='all',target=all?d:+ch.dataset.len;
+    ch.setAttribute('aria-pressed',(all?whole:Math.abs(len-target)<.05)?'true':'false');
+  });
+  drawWave();
+}
+function setSelLen(target){
+  const d=sampleTrack.dur,len=target==='all'?d:Math.min(+target,d);
+  const s=target==='all'?0:clamp(state.selStart,0,d-len);
+  state.selStart=s;state.selEnd=s+len;
+  syncSel();preview();
+}
+/* a short preview so you hear what you picked */
+async function preview(){
+  await wake();
+  if(!sampleTrack.buffer)return;
+  trigger(sampleTrack,1,actx.currentTime+.02,3);
+  hitTrack(5);
 }
 let lastNow=-1;
 function setNow(step){
@@ -869,6 +969,8 @@ tracksEl.addEventListener('click',e=>{
     const t=tracks[+mu.closest('.track').dataset.t];
     setMute(t,!t.mute);return;
   }
+  const lc=e.target.closest('.len-chip');
+  if(lc){setSelLen(lc.dataset.len);return;}
   if(e.target.closest('.up')){$('#file').click();return;}
   if(e.target.closest('.demo')){useDemo();return;}
 });
@@ -880,10 +982,6 @@ tracksEl.addEventListener('input',e=>{
     if(k==='vol')t.vol=v/100;else if(k==='pitch')t.pitch=v;else if(k==='echo')t.echo=v/100;else t.muffle=v/100;
     setRange(r,v);$('output[data-o="'+k+'"]',t.el).textContent=fmt(k,v);
     applyTrackAudio(t);
-  }else if(r.dataset.x==='chop'){
-    state.whole=v>=1000;state.chop=chopFromPos(v);setRange(r,v);$('output[data-o="chop"]',sampleTrack.el).textContent=fmtChop(state.chop);drawWave();
-  }else if(r.dataset.x==='spot'){
-    state.spot=v/100;setRange(r,v);$('output[data-o="spot"]',sampleTrack.el).textContent=v+'%';drawWave();
   }
 });
 
@@ -937,19 +1035,45 @@ function setRecUI(on,secs){
   }else l.textContent='Save remix';
 }
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-async function toMp3(blob){
+/* the MP3 maker is loaded from the web, with a second address as a backup */
+const LAME_URLS=['https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js','https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js'];
+function loadScript(src){return new Promise(function(res,rej){
+  const el=document.createElement('script');el.src=src;el.onload=res;el.onerror=function(){el.remove();rej(new Error('load'))};
+  document.head.appendChild(el);
+});}
+async function getLame(){
+  if(window.lamejs)return true;
+  for(const u of LAME_URLS){try{await loadScript(u);if(window.lamejs)return true;}catch(e){}}
+  return false;
+}
+window.addEventListener('load',function(){setTimeout(getLame,1500)});
+async function decodeRec(blob){
   const ab=await blob.arrayBuffer();
-  const buf=await new Promise((res,rej)=>{const p=actx.decodeAudioData(ab,res,rej);if(p&&p.catch)p.catch(rej)});
+  return new Promise((res,rej)=>{const p=actx.decodeAudioData(ab,res,rej);if(p&&p.catch)p.catch(rej)});
+}
+const toI16=f=>{const o=new Int16Array(f.length);for(let i=0;i<f.length;i++){const s=Math.max(-1,Math.min(1,f[i]));o[i]=s<0?s*32768:s*32767}return o};
+function bufToMp3(buf){
   const l=buf.getChannelData(0),r=buf.numberOfChannels>1?buf.getChannelData(1):l;
-  const i16=f=>{const o=new Int16Array(f.length);for(let i=0;i<f.length;i++){const s=Math.max(-1,Math.min(1,f[i]));o[i]=s<0?s*32768:s*32767}return o};
-  const L=i16(l),R=i16(r),enc=new lamejs.Mp3Encoder(2,buf.sampleRate,192),out=[];
+  const L=toI16(l),R=toI16(r),enc=new lamejs.Mp3Encoder(2,buf.sampleRate,192),out=[];
   for(let i=0;i<L.length;i+=1152){const b=enc.encodeBuffer(L.subarray(i,i+1152),R.subarray(i,i+1152));if(b.length)out.push(b)}
   const end=enc.flush();if(end.length)out.push(end);
   return new Blob(out,{type:'audio/mpeg'});
 }
+/* safety net if the MP3 maker cannot load: an uncompressed WAV file, still not a video format */
+function bufToWav(buf){
+  const l=toI16(buf.getChannelData(0)),r=toI16(buf.numberOfChannels>1?buf.getChannelData(1):buf.getChannelData(0));
+  const n=l.length,ab=new ArrayBuffer(44+n*4),v=new DataView(ab);
+  const w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))};
+  w(0,'RIFF');v.setUint32(4,36+n*4,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,2,true);
+  v.setUint32(24,buf.sampleRate,true);v.setUint32(28,buf.sampleRate*4,true);v.setUint16(32,4,true);v.setUint16(34,16,true);
+  w(36,'data');v.setUint32(40,n*4,true);
+  for(let i=0;i<n;i++){v.setInt16(44+i*4,l[i],true);v.setInt16(46+i*4,r[i],true)}
+  return new Blob([ab],{type:'audio/wav'});
+}
 async function saveRemix(){
   if(recording)return;
   if(!dlNS){toast('Saving files is not available in this view.');return;}
+  if(dlNS!==blobSaver){toast('Saving an MP3 works on the live site. This preview cannot save MP3 files.');return;}
   const type=pickType();
   if(!type){toast('This browser cannot record audio for saving.');return;}
   await wake();
@@ -960,6 +1084,7 @@ async function saveRemix(){
   const loops=+$('#loops').value||4,loopMs=16*stepDur()*1000,chunks=[];
   rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   const stopped=new Promise(res=>{rec.onstop=res});
+  const lameReady=getLame();
   recording=true;setRecUI(true,loops*loopMs/1000+1.5);
   toast('Recording '+loops+' loops from the top. Keep the page open.');
   if(state.playing)stop();
@@ -970,19 +1095,30 @@ async function saveRemix(){
   await wait(1500);
   rec.stop();await stopped;
   recording=false;setRecUI(false);
-  let blob=new Blob(chunks,{type:type.mime}),ext=type.ext;
-  if(!blob.size){toast('Nothing was recorded. Try again.');return;}
-  if(window.lamejs&&dlNS===blobSaver){
-    try{toast('Making your MP3.');blob=await toMp3(blob);ext='mp3';}catch(e){}
-  }
+  const raw=new Blob(chunks,{type:type.mime});
+  if(!raw.size){toast('Nothing was recorded. Try again.');return;}
+  toast('Making your MP3.');
+  let blob,ext;
   try{
-    const r=await dlNS.save({filename:'mochi-remix-'+state.flavor+'.'+ext,data:blob});
-    toast(r&&r.status==='delivered'?'Sent.':(ext==='mp3'?'Remix saved as MP3.':(ext==='mp4'?'Remix saved as MP4.':'Remix saved as WebM.')));
+    const buf=await decodeRec(raw),ok=await lameReady||await getLame();
+    if(ok){blob=bufToMp3(buf);ext='mp3';}else{blob=bufToWav(buf);ext='wav';}
+  }catch(e){toast('Could not make the file. Please try again.');return;}
+  try{
+    await dlNS.save({filename:'mochi-remix-'+state.flavor+'.'+ext,data:blob});
+    toast(ext==='mp3'?'Remix saved as MP3.':'Saved as WAV because the MP3 maker could not load. Check your connection and save again for an MP3.');
   }catch(err){
-    toast(err&&err.code==='declined'?'No problem. Nothing was saved.':'Saving did not work in this view.');
+    toast('Saving did not work. Please try again.');
   }
 }
 $('#save').addEventListener('click',saveRemix);
+
+/* ---------- how to play ---------- */
+(function(){
+  const dlg=$('#howto'),open=$('#howtoBtn'),close=$('#howtoClose');
+  open.addEventListener('click',()=>{if(dlg.showModal)dlg.showModal();else dlg.setAttribute('open','')});
+  close.addEventListener('click',()=>dlg.close());
+  dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()});
+})();
 
 /* ---------- share (a link that rebuilds the beat) ---------- */
 const SHARE_BASE=location.href.split('#')[0];
@@ -1093,38 +1229,61 @@ function computePeaks(t){
 function rr(g,x,y,w,h,r){
   r=Math.min(r,w/2,h/2);g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();
 }
+function selRect(w){
+  const d=sampleTrack.dur;
+  let x0=state.selStart/d*w,x1=state.selEnd/d*w;
+  if(x1-x0<14){if(x0+14<=w)x1=x0+14;else{x1=w;x0=w-14;}}
+  return{x0:x0,x1:x1};
+}
 function drawWave(){
   const t=sampleTrack,c=t.els.wave;if(!c||!t.peaks)return;
-  const w=c.clientWidth||300,h=c.clientHeight||72,dp=Math.min(window.devicePixelRatio||1,2);
+  const w=c.clientWidth||300,h=c.clientHeight||96,dp=Math.min(window.devicePixelRatio||1,2);
   c.width=Math.round(w*dp);c.height=Math.round(h*dp);
   const g=c.getContext('2d');g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,w,h);
-  const sky=tok('sky'),ink=tok('ink'),soft=tok('ink-soft');
-  const d=t.dur,chop=Math.min(state.chop,d);
-  g.textBaseline='top';g.font='600 12px Fredoka, system-ui, sans-serif';
-  for(let i=0;i<4;i++){
-    const s=sliceStart(t,i),x0=s/d*w,x1=Math.min(w,Math.max(x0+8,(s+Math.min(chop,d-s))/d*w));
-    g.globalAlpha=.6;g.fillStyle=sky;rr(g,x0,0,x1-x0,h,8);g.fill();
-    g.globalAlpha=1;g.fillStyle=ink;g.fillText(String(i+1),x0+5,3);
-  }
-  const bw=3,gap=2,n=Math.max(1,Math.floor(w/(bw+gap)));
-  g.fillStyle=soft;g.globalAlpha=.8;
+  const sky=tok('sky'),skyd=tok('sky-d'),ink=tok('ink'),soft=tok('ink-soft'),card=tok('card');
+  const R=selRect(w),bwid=R.x1-R.x0,bw=3,gap=2,n=Math.max(1,Math.floor(w/(bw+gap)));
+  /* the glowing box */
+  g.globalAlpha=.6;g.fillStyle=sky;rr(g,R.x0,3,bwid,h-6,10);g.fill();
+  g.globalAlpha=1;g.lineWidth=3;g.strokeStyle=skyd;rr(g,R.x0+1.5,4.5,Math.max(0,bwid-3),h-9,9);g.stroke();
+  /* the wave: bold inside the box, faded outside */
   for(let b=0;b<n;b++){
     const a=Math.floor(b/n*t.peaks.length),z=Math.max(a+1,Math.floor((b+1)/n*t.peaks.length));
     let p=0;for(let j=a;j<z;j++)if(t.peaks[j]>p)p=t.peaks[j];
-    const hh=Math.max(4,p*(h-14));rr(g,b*(bw+gap),(h-hh)/2+4,bw,hh,1.5);g.fill();
+    const x=b*(bw+gap),mid=x+bw/2,inside=mid>=R.x0&&mid<=R.x1,hh=Math.max(4,p*(h-34));
+    g.globalAlpha=inside?.95:.55;g.fillStyle=inside?ink:soft;
+    rr(g,x,(h-hh)/2+8,bw,hh,1.5);g.fill();
   }
   g.globalAlpha=1;
-}
-function updateChopRange(){
-  if(state.whole||state.chop>sampleTrack.dur)state.chop=sampleTrack.dur;
-  syncChop();
+  g.textAlign='center';g.textBaseline='middle';g.font='700 13px Fredoka, system-ui, sans-serif';
+  if(state.mode==='pieces'){
+    const pw=bwid/4;
+    if(pw>=10){
+      g.strokeStyle=skyd;g.lineWidth=2;g.setLineDash([4,4]);
+      for(let i=1;i<4;i++){const x=R.x0+pw*i;g.beginPath();g.moveTo(x,10);g.lineTo(x,h-10);g.stroke();}
+      g.setLineDash([]);
+    }
+    if(pw>=22){
+      for(let i=0;i<4;i++){
+        const cx=R.x0+pw*(i+.5);
+        g.globalAlpha=.92;g.fillStyle=card;g.beginPath();g.arc(cx,15,10,0,6.2832);g.fill();
+        g.globalAlpha=1;g.fillStyle=ink;g.fillText(String(i+1),cx,15.5);
+      }
+    }
+  }else if(bwid>=120){
+    const cx=R.x0+bwid/2;
+    g.globalAlpha=.92;g.fillStyle=card;rr(g,cx-56,5,112,20,10);g.fill();
+    g.globalAlpha=1;g.fillStyle=ink;g.fillText('All blue squares',cx,15.5);
+  }
+  /* grips on both edges when the box is wide enough to grab */
+  if(bwid>=40){g.fillStyle=skyd;rr(g,R.x0+1,h/2-12,5,24,2.5);g.fill();rr(g,R.x1-6,h/2-12,5,24,2.5);g.fill();}
+  g.textAlign='start';
 }
 function setSample(pcm,sr,buf,name){
   const t=sampleTrack;
   t.pcm=pcm;t.sr=sr;t.dur=pcm.length/sr;t.buffer=buf||null;t.fileName=name;
   if(actx&&!t.buffer)t.buffer=toBuffer(pcm,sr);
   t.els.fn.textContent=name;
-  computePeaks(t);updateChopRange();drawWave();touchShare();
+  computePeaks(t);autoPick();buildChips();syncSel();touchShare();
 }
 async function loadFile(file){
   if(!file)return;
@@ -1138,7 +1297,7 @@ async function loadFile(file){
     if(sampleTrack.steps.filter(Boolean).length<2)sampleTrack.steps=genSample(.4,Math.random);
     paintAll();
     trigger(sampleTrack,1,actx.currentTime+.02);hitTrack(5,true);
-    toast('Chopped '+file.name+' into 4 slices. Tap the blue squares to place them.');
+    toast('Loaded '+file.name+'. Drag the glowing box to pick a part, then tap the blue squares.');
   }catch(err){
     toast('That file did not open. Try an MP3, WAV, M4A or OGG.');
   }
@@ -1155,6 +1314,54 @@ sampleTrack.el.addEventListener('drop',e=>{
   const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
   if(f)loadFile(f);
 });
+/* drag the glowing box on the wave (mouse, touch or pen) */
+(function(){
+  const c=sampleTrack.els.wave;let drag=null,keyT=null;
+  const xOf=e=>{const r=c.getBoundingClientRect();return clamp(e.clientX-r.left,0,r.width)};
+  c.addEventListener('pointerdown',e=>{
+    const w=c.clientWidth,d=sampleTrack.dur,x=xOf(e),R=selRect(w);
+    let mode='move';
+    if(R.x1-R.x0>=40){if(Math.abs(x-R.x0)<=10)mode='start';else if(Math.abs(x-R.x1)<=10)mode='end';}
+    if(mode==='move'&&(x<R.x0||x>R.x1)){
+      const len=state.selEnd-state.selStart,s=clamp(x/w*d-len/2,0,d-len);
+      state.selStart=s;state.selEnd=s+len;syncSel();
+    }
+    drag={mode:mode,x:x,s:state.selStart,e:state.selEnd};
+    try{c.setPointerCapture(e.pointerId)}catch(err){}
+    c.classList.add('dragging');e.preventDefault();
+  });
+  c.addEventListener('pointermove',e=>{
+    const w=c.clientWidth,d=sampleTrack.dur,x=xOf(e);
+    if(!drag){
+      const R=selRect(w),near=(R.x1-R.x0>=40)&&(Math.abs(x-R.x0)<=10||Math.abs(x-R.x1)<=10);
+      c.style.cursor=near?'ew-resize':'grab';return;
+    }
+    const dt=(x-drag.x)/w*d,ms=Math.min(MIN_SEL,d);
+    if(drag.mode==='move'){
+      const len=drag.e-drag.s,s=clamp(drag.s+dt,0,d-len);
+      state.selStart=s;state.selEnd=s+len;
+    }else if(drag.mode==='start'){
+      state.selStart=clamp(drag.s+dt,0,drag.e-ms);
+    }else{
+      state.selEnd=clamp(drag.e+dt,drag.s+ms,d);
+    }
+    syncSel();
+  });
+  c.addEventListener('pointerup',()=>{if(!drag)return;drag=null;c.classList.remove('dragging');preview();});
+  c.addEventListener('pointercancel',()=>{drag=null;c.classList.remove('dragging')});
+  c.addEventListener('keydown',e=>{
+    if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+    e.preventDefault();
+    const d=sampleTrack.dur,len=state.selEnd-state.selStart,st=d*(e.shiftKey?.05:.01)*(e.key==='ArrowLeft'?-1:1);
+    const s=clamp(state.selStart+st,0,d-len);
+    state.selStart=s;state.selEnd=s+len;syncSel();
+    clearTimeout(keyT);keyT=setTimeout(preview,350);
+  });
+  sampleTrack.el.addEventListener('change',e=>{
+    if(e.target.name!=='playmode')return;
+    state.mode=e.target.value;syncSel();preview();
+  });
+})();
 if(window.ResizeObserver)new ResizeObserver(drawWave).observe(sampleTrack.els.wave);
 const redrawTheme=()=>{refreshCols();drawWave()};
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',redrawTheme)}catch(e){}
@@ -1180,7 +1387,9 @@ applyFlavorSettings(FLAVORS[0]);
 genPatterns(FLAVORS[0],makeRng(7));
 paintAll();
 computePeaks(sampleTrack);
-updateChopRange();
+autoPick();
+buildChips();
+syncSel();
 syncDeck();
 setPlayUI();
 readHash(true);
