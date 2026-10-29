@@ -3,11 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Mochi Mixer</title>
-<meta name="description" content="A pastel step sequencer where mochi characters play synth sounds or chops of your own audio. Remix beats, save them, and share a link.">
+<title>Mochi Mixer: free online beat maker and song remixer</title>
+<meta name="description" content="Mochi Mixer is a free online beat maker. Tap squares to build a beat with six cute mochi, remix your own songs, save your beat as an MP3 and share it with a link.">
+<link rel="canonical" href="https://kawai-projects.github.io/mochi-mixer/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Mochi Mixer">
-<meta property="og:description" content="A pastel step sequencer where mochi characters play synth sounds or chops of your own audio. Remix beats, save them, and share a link.">
+<meta property="og:site_name" content="Mochi Mixer">
+<meta property="og:url" content="https://kawai-projects.github.io/mochi-mixer/">
+<meta property="og:title" content="Mochi Mixer: free online beat maker and song remixer">
+<meta property="og:description" content="Mochi Mixer is a free online beat maker. Tap squares to build a beat with six cute mochi, remix your own songs, save your beat as an MP3 and share it with a link.">
+<meta property="og:image" content="https://kawai-projects.github.io/mochi-mixer/preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mochi Mixer with six cute colorful mochi characters">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mochi Mixer: free online beat maker and song remixer">
+<meta name="twitter:description" content="Mochi Mixer is a free online beat maker. Tap squares to build a beat with six cute mochi, remix your own songs, save your beat as an MP3 and share it with a link.">
+<meta name="twitter:image" content="https://kawai-projects.github.io/mochi-mixer/preview.png">
+<!-- Google Search Console: if you verify with an HTML tag, paste it here, for example:
+<meta name="google-site-verification" content="YOUR_CODE"> -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Mochi Mixer","url":"https://kawai-projects.github.io/mochi-mixer/","description":"Mochi Mixer is a free online beat maker. Tap squares to build a beat with six cute mochi, remix your own songs, save your beat as an MP3 and share it with a link.","image":"https://kawai-projects.github.io/mochi-mixer/preview.png","applicationCategory":"MultimediaApplication","genre":"Music","operatingSystem":"Any","browserRequirements":"Requires JavaScript and a modern browser","inLanguage":"en","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
 <meta name="theme-color" content="#FFF0F6">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cpath d='M60 12C94 12 114 38 114 68C114 92 94 104 60 104C26 104 6 92 6 68C6 38 26 12 60 12Z' fill='%23FF86B7' stroke='%23D9528B' stroke-width='6'/%3E%3Ccircle cx='42' cy='62' r='7' fill='%233B2146'/%3E%3Ccircle cx='78' cy='62' r='7' fill='%233B2146'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -302,6 +318,10 @@ fieldset.seg legend{padding:0;margin-bottom:6px;font-size:14px;color:var(--ink-s
   .sp-link{flex-wrap:wrap}
 }
 
+.about{display:grid;gap:4px;margin-top:8px;padding:20px 22px;background:var(--card);border:3px solid var(--line);border-radius:26px;line-height:1.5}
+.about h2{font-family:var(--font-display);font-weight:400;font-size:26px;line-height:1.1}
+.about h3{font-size:16px;font-weight:700;margin-top:10px}
+.about p{font-size:15px;color:var(--ink-soft)}
 footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
 
 #toast{
@@ -419,7 +439,18 @@ footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
 
   <div class="tracks" id="tracks"></div>
 
-  <footer>Every sound is made in your browser. Audio you add stays on your device.<br>Visits are counted with Cloudflare Web Analytics, which uses no cookies.<br>Version 1.4.1</footer>
+  <section class="about" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">What is Mochi Mixer?</h2>
+    <p>Mochi Mixer is a free online beat maker that runs right in your browser. Six cute mochi each play a sound: a kick drum, a clap, a shaker, a bell, a plucked string, and any song or sound you add. Tap the squares to place sounds, press play, and hit Remix for a fresh beat.</p>
+    <h3>Can I remix my own song?</h3>
+    <p>Yes. Add an audio file on the blue mochi, pick which part of the song to use, and cut it into four parts that you can place anywhere in your beat. Your file stays on your device.</p>
+    <h3>Can I save and share my beat?</h3>
+    <p>Yes. Save remix records your beat and downloads it as an MP3. Share copies a link that rebuilds your beat, tempo and flavor for anyone who opens it.</p>
+    <h3>Does it work on a phone?</h3>
+    <p>Yes. It works in Chrome, Safari and Firefox on phones, tablets and computers. Sound starts after your first tap.</p>
+  </section>
+
+  <footer>Every sound is made in your browser. Audio you add stays on your device.<br>Visits are counted with Cloudflare Web Analytics, which uses no cookies.<br>Version 1.5.0</footer>
 </main>
 
 <div id="toast" role="status" aria-live="polite"></div>

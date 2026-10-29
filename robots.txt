@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kawai-projects.github.io/mochi-mixer/sitemap.xml
