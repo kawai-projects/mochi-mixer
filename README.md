@@ -27,13 +27,7 @@ Open `index.html` in Chrome, Safari or Firefox. Sound starts after your first ta
 
 ## Cloudflare Web Analytics
 
-Cloudflare Web Analytics counts visits without cookies.
-
-1. In the Cloudflare dashboard open Analytics & Logs, then Web Analytics, and choose Add a site.
-2. Enter the hostname `kawai-projects.github.io`. Because the site is not proxied through Cloudflare, choose the JavaScript snippet option.
-3. Copy the token from the snippet. It is the long string inside `data-cf-beacon='{"token": "..."}'`.
-4. At the bottom of `index.html`, replace `YOUR_CLOUDFLARE_TOKEN` with that token and remove the `<!--` and `-->` lines around the script tag.
-5. Commit and push. Visits show up in Cloudflare within a few minutes.
+Cloudflare Web Analytics counts visits without cookies. The snippet with the site token is already at the bottom of `index.html`. View the numbers in the Cloudflare dashboard under Analytics & Logs, then Web Analytics, for `kawai-projects.github.io`.
 
 ## Publishing changes
 

@@ -231,6 +231,17 @@ canvas.wave.dragging{cursor:grabbing}
   padding:3px 12px;font-weight:600;font-size:14px;color:var(--ink);
 }
 .len-chip.long{opacity:.6}
+.hear{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.hear[hidden]{display:none}
+.hear-btns{display:flex;gap:6px}
+.hear-btn{width:36px;height:36px;border-radius:50%;border:3px solid var(--cd);background:var(--c);color:var(--on-accent);font-weight:700;font-size:15px;box-shadow:0 3px 0 var(--cd);transition:transform .12s}
+.hear-btn:hover{transform:translateY(-1px)}
+.hear-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--cd)}
+.hear-btn[data-p="1"],.track.pieces .step.on[data-v="1"]{--c:var(--pink);--cd:var(--pink-d)}
+.hear-btn[data-p="2"],.track.pieces .step.on[data-v="2"]{--c:var(--butter);--cd:var(--butter-d)}
+.hear-btn[data-p="3"],.track.pieces .step.on[data-v="3"]{--c:var(--mint);--cd:var(--mint-d)}
+.hear-btn[data-p="4"],.track.pieces .step.on[data-v="4"]{--c:var(--lav);--cd:var(--lav-d)}
+.x-hint{font-size:13px;color:var(--ink-soft);line-height:1.35}
 .len-chip:hover{border-color:var(--cd)}
 .len-chip[aria-pressed="true"]{background:var(--c);border-color:var(--cd);color:var(--on-accent)}
 .x-side{display:grid;gap:14px;min-width:0}
@@ -343,12 +354,12 @@ footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
       <h2 id="howtoTitle">How to play</h2>
       <ol class="ht-list">
         <li><b>Press play.</b> Tap the big round button. Sound starts after your first tap.</li>
-        <li><b>Tap the squares.</b> Each row belongs to one mochi. Tap a square to place a sound, and tap it again on the Bell Bun, Pudding Pluck and Your Sound rows to change the note.</li>
+        <li><b>Tap the squares.</b> Each row belongs to one mochi. Tap a square to place a sound. On Bell Bun and Pudding Pluck, tap it again to change the note. On Your Sound, the number on a square is the part of your song it plays.</li>
         <li><b>Pick a flavor.</b> Strawberry, Matcha, Taro and Mango change the tempo, swing and musical scale.</li>
         <li><b>Hit Remix!</b> Get a fresh beat in that flavor. Not happy? Tap Remix again, or Clear all squares to start empty.</li>
         <li><b>Shape each mochi.</b> Use Loud, Pitch, Echo and Muffle on every row. Press a mochi's mute button and it falls asleep.</li>
-        <li><b>Add your own sound.</b> On Your Sound, press Swap in your sound and pick a song or drop a file. Drag the glowing box on the wave to choose which part to use, and tap a length like 2 s or Whole song.</li>
-        <li><b>Choose what a blue square plays.</b> One of 4 pieces cuts your part into four numbered pieces. All of it plays the whole part on every square.</li>
+        <li><b>Add your own sound.</b> On Your Sound, press Swap in your sound and pick a song or drop a file. Drag the glowing box on the wave to choose which part of the song to use, and tap a length like 2 s or Whole song. The song plays exactly as it is, lyrics included.</li>
+        <li><b>Cut it into parts.</b> With "Parts 1 to 4", the glowing box is split into four colored parts. Press the numbers under "Hear a part" to listen to each one. The number on a blue square is the part it plays, so tap a square again to switch between 1, 2, 3 and 4. A single square repeats the start of its part every loop. Short parts of 1 to 4 s work best for beats. Choose "The whole part" and every square plays the whole thing, with no numbers.</li>
         <li><b>Save it as an MP3.</b> Pick how many loops, press Save remix, and keep the page open while it records. The MP3 downloads to your device.</li>
         <li><b>Share it.</b> Press Share to copy a link that rebuilds your beat, tempo, flavor and sleeping mochi. A sound you added yourself is not in the link.</li>
       </ol>
@@ -408,7 +419,7 @@ footer{font-size:14px;color:var(--ink-soft);text-align:center;padding-top:4px}
 
   <div class="tracks" id="tracks"></div>
 
-  <footer>Every sound is made in your browser. Audio you add stays on your device.<br>Version 1.3.4</footer>
+  <footer>Every sound is made in your browser. Audio you add stays on your device.<br>Visits are counted with Cloudflare Web Analytics, which uses no cookies.<br>Version 1.4.1</footer>
 </main>
 
 <div id="toast" role="status" aria-live="polite"></div>
@@ -705,15 +716,22 @@ function buildTrack(t,i){
       +'<p class="x-label">Drag the glowing box along the wave to pick which part of the sound to use.</p>'
       +'<canvas class="wave" tabindex="0" role="img" aria-label="Waveform of the sound. The highlighted box is the part in use. Press the left and right arrow keys to move it."></canvas>'
       +'<p class="sel-info"></p>'
+      +'<div class="hear"><span class="x-label">Hear a part:</span><div class="hear-btns">'
+        +'<button type="button" class="hear-btn" data-p="1" aria-label="Hear part 1">1</button>'
+        +'<button type="button" class="hear-btn" data-p="2" aria-label="Hear part 2">2</button>'
+        +'<button type="button" class="hear-btn" data-p="3" aria-label="Hear part 3">3</button>'
+        +'<button type="button" class="hear-btn" data-p="4" aria-label="Hear part 4">4</button>'
+      +'</div></div>'
       +'<div><p class="x-label">How long a part?</p><div class="len-chips" role="group" aria-label="Length of the part in use"></div></div>'
       +'</div>'
       +'<div class="x-side">'
       +'<p class="fname"><span>Sound in use</span><strong class="fn">Demo ditty</strong></p>'
       +'<div class="x-btns"><button type="button" class="soft up">Swap in your sound</button><button type="button" class="ghost demo">Use demo</button></div>'
-      +'<fieldset class="seg"><legend>Each blue square plays</legend><div class="seg-row">'
-      +'<label><input type="radio" name="playmode" value="pieces" checked><span>One of 4 pieces</span></label>'
-      +'<label><input type="radio" name="playmode" value="whole"><span>All of it</span></label>'
+      +'<fieldset class="seg"><legend>What each blue square plays</legend><div class="seg-row">'
+      +'<label><input type="radio" name="playmode" value="pieces" checked><span>Parts 1 to 4</span></label>'
+      +'<label><input type="radio" name="playmode" value="whole"><span>The whole part</span></label>'
       +'</div></fieldset>'
+      +'<p class="x-hint"></p>'
       +'<input type="file" id="file" accept="audio/*" hidden>'
       +'</div></div>';
   }
@@ -734,7 +752,7 @@ function buildTrack(t,i){
   t.els.mochi=$('.mochi',sec);
   t.els.steps=Array.prototype.slice.call(sec.querySelectorAll('.step'));
   t.els.armL=$('.arm-l',sec);t.els.armR=$('.arm-r',sec);
-  if(t.kind==='sample'){t.els.wave=$('canvas.wave',sec);t.els.fn=$('.fn',sec);t.els.info=$('.sel-info',sec);t.els.chips=$('.len-chips',sec);}
+  if(t.kind==='sample'){t.els.wave=$('canvas.wave',sec);t.els.fn=$('.fn',sec);t.els.info=$('.sel-info',sec);t.els.hear=$('.hear',sec);t.els.hint=$('.x-hint',sec);t.els.chips=$('.len-chips',sec);}
 }
 tracks.forEach(buildTrack);
 
@@ -761,8 +779,10 @@ function paintStep(ti,i){
   const t=tracks[ti],el=t.els.steps[i],v=t.steps[i];
   el.classList.toggle('on',v>0);
   el.setAttribute('aria-pressed',v>0?'true':'false');
-  el.textContent=(v>0&&t.L>1)?String(v):'';
-  el.setAttribute('aria-label',t.name+', step '+(i+1)+(v>0?(t.L>1?', note '+v:', on'):', off'));
+  const sw=t.kind==='sample'&&state.mode==='whole';
+  el.textContent=(v>0&&t.L>1&&!sw)?String(v):'';
+  if(v>0&&t.kind==='sample'&&!sw)el.dataset.v=String(v);else delete el.dataset.v;
+  el.setAttribute('aria-label',t.name+', step '+(i+1)+(v>0?(t.L>1&&!sw?(t.kind==='sample'?', part '+v:', note '+v):', on'):', off'));
 }
 function paintAll(){tracks.forEach((t,ti)=>{for(let i=0;i<16;i++)paintStep(ti,i)});touchShare()}
 let shareOpen=false;
@@ -822,8 +842,14 @@ function buildChips(){
 function syncSel(){
   const t=sampleTrack,d=t.dur,len=state.selEnd-state.selStart,whole=len>=d-.01;
   const a=whole?('Using the whole sound, '+fmtDur(d)+' long.'):('Using '+fmtPos(state.selStart)+' to '+fmtPos(state.selEnd)+', '+fmtDur(len)+' long.');
-  const b=state.mode==='whole'?' Every blue square plays all of it.':(' Each blue square plays one piece of '+fmtDur(len/4)+'.');
+  const b=state.mode==='whole'?' Every blue square plays the whole part.':(' It is cut into 4 parts of '+fmtDur(len/4)+' each.');
   t.els.info.textContent=a+b;
+  t.el.classList.toggle('pieces',state.mode==='pieces');
+  t.els.hear.hidden=state.mode==='whole';
+  t.els.hint.textContent=state.mode==='whole'
+    ?'Every blue square plays the whole part, so the squares have no numbers.'
+    :'The number on a blue square is the part it plays. Tap a square again to switch it between parts 1, 2, 3 and 4.';
+  const ti=tracks.indexOf(t);if(ti>=0&&t.els.steps)for(let i=0;i<16;i++)paintStep(ti,i);
   t.els.chips.querySelectorAll('.len-chip').forEach(ch=>{
     const all=ch.dataset.len==='all',target=all?d:+ch.dataset.len;
     ch.setAttribute('aria-pressed',(all?whole:Math.abs(len-target)<.05)?'true':'false');
@@ -837,10 +863,10 @@ function setSelLen(target){
   syncSel();preview();
 }
 /* a short preview so you hear what you picked */
-async function preview(){
+async function preview(part){
   await wake();
   if(!sampleTrack.buffer)return;
-  trigger(sampleTrack,1,actx.currentTime+.02,3);
+  trigger(sampleTrack,part||1,actx.currentTime+.02,3);
   hitTrack(5);
 }
 let lastNow=-1;
@@ -953,7 +979,7 @@ function hitTrack(ti,strong){
 /* ---------- editing steps ---------- */
 async function cycle(ti,i){
   const t=tracks[ti];
-  t.steps[i]=(t.steps[i]+1)%(t.L+1);
+  t.steps[i]=(t.kind==='sample'&&state.mode==='whole')?(t.steps[i]?0:1):(t.steps[i]+1)%(t.L+1);
   paintStep(ti,i);touchShare();
   if(t.steps[i]>0){
     await wake();
@@ -971,6 +997,8 @@ tracksEl.addEventListener('click',e=>{
   }
   const lc=e.target.closest('.len-chip');
   if(lc){setSelLen(lc.dataset.len);return;}
+  const hb=e.target.closest('.hear-btn');
+  if(hb){preview(+hb.dataset.p);return;}
   if(e.target.closest('.up')){$('#file').click();return;}
   if(e.target.closest('.demo')){useDemo();return;}
 });
@@ -1241,9 +1269,14 @@ function drawWave(){
   c.width=Math.round(w*dp);c.height=Math.round(h*dp);
   const g=c.getContext('2d');g.setTransform(dp,0,0,dp,0,0);g.clearRect(0,0,w,h);
   const sky=tok('sky'),skyd=tok('sky-d'),ink=tok('ink'),soft=tok('ink-soft'),card=tok('card');
+  const PC=['pink','butter','mint','lav'].map(tok);
   const R=selRect(w),bwid=R.x1-R.x0,bw=3,gap=2,n=Math.max(1,Math.floor(w/(bw+gap)));
   /* the glowing box */
-  g.globalAlpha=.6;g.fillStyle=sky;rr(g,R.x0,3,bwid,h-6,10);g.fill();
+  if(state.mode==='pieces'){
+    g.save();rr(g,R.x0,3,bwid,h-6,10);g.clip();
+    for(let i=0;i<4;i++){g.globalAlpha=.6;g.fillStyle=PC[i];g.fillRect(R.x0+bwid/4*i,3,bwid/4+1,h-6);}
+    g.restore();
+  }else{g.globalAlpha=.6;g.fillStyle=sky;rr(g,R.x0,3,bwid,h-6,10);g.fill();}
   g.globalAlpha=1;g.lineWidth=3;g.strokeStyle=skyd;rr(g,R.x0+1.5,4.5,Math.max(0,bwid-3),h-9,9);g.stroke();
   /* the wave: bold inside the box, faded outside */
   for(let b=0;b<n;b++){
@@ -1265,14 +1298,14 @@ function drawWave(){
     if(pw>=22){
       for(let i=0;i<4;i++){
         const cx=R.x0+pw*(i+.5);
-        g.globalAlpha=.92;g.fillStyle=card;g.beginPath();g.arc(cx,15,10,0,6.2832);g.fill();
+        g.globalAlpha=1;g.fillStyle=PC[i];g.beginPath();g.arc(cx,15,10,0,6.2832);g.fill();g.lineWidth=2;g.strokeStyle=ink;g.stroke();
         g.globalAlpha=1;g.fillStyle=ink;g.fillText(String(i+1),cx,15.5);
       }
     }
   }else if(bwid>=120){
     const cx=R.x0+bwid/2;
     g.globalAlpha=.92;g.fillStyle=card;rr(g,cx-56,5,112,20,10);g.fill();
-    g.globalAlpha=1;g.fillStyle=ink;g.fillText('All blue squares',cx,15.5);
+    g.globalAlpha=1;g.fillStyle=ink;g.fillText('The whole part',cx,15.5);
   }
   /* grips on both edges when the box is wide enough to grab */
   if(bwid>=40){g.fillStyle=skyd;rr(g,R.x0+1,h/2-12,5,24,2.5);g.fill();rr(g,R.x1-6,h/2-12,5,24,2.5);g.fill();}
@@ -1326,7 +1359,7 @@ sampleTrack.el.addEventListener('drop',e=>{
       const len=state.selEnd-state.selStart,s=clamp(x/w*d-len/2,0,d-len);
       state.selStart=s;state.selEnd=s+len;syncSel();
     }
-    drag={mode:mode,x:x,s:state.selStart,e:state.selEnd};
+    drag={mode:mode,x:x,s:state.selStart,e:state.selEnd,moved:false};
     try{c.setPointerCapture(e.pointerId)}catch(err){}
     c.classList.add('dragging');e.preventDefault();
   });
@@ -1336,6 +1369,7 @@ sampleTrack.el.addEventListener('drop',e=>{
       const R=selRect(w),near=(R.x1-R.x0>=40)&&(Math.abs(x-R.x0)<=10||Math.abs(x-R.x1)<=10);
       c.style.cursor=near?'ew-resize':'grab';return;
     }
+    if(Math.abs(x-drag.x)>3)drag.moved=true;
     const dt=(x-drag.x)/w*d,ms=Math.min(MIN_SEL,d);
     if(drag.mode==='move'){
       const len=drag.e-drag.s,s=clamp(drag.s+dt,0,d-len);
@@ -1347,7 +1381,17 @@ sampleTrack.el.addEventListener('drop',e=>{
     }
     syncSel();
   });
-  c.addEventListener('pointerup',()=>{if(!drag)return;drag=null;c.classList.remove('dragging');preview();});
+  c.addEventListener('pointerup',e=>{
+    if(!drag)return;
+    const dr=drag;drag=null;c.classList.remove('dragging');
+    let part=1;
+    /* a plain tap on a part plays that part */
+    if(!dr.moved&&dr.mode==='move'&&state.mode==='pieces'){
+      const R=selRect(c.clientWidth),x=xOf(e);
+      if(x>=R.x0&&x<=R.x1)part=clamp(Math.floor((x-R.x0)/(R.x1-R.x0)*4)+1,1,4);
+    }
+    preview(part);
+  });
   c.addEventListener('pointercancel',()=>{drag=null;c.classList.remove('dragging')});
   c.addEventListener('keydown',e=>{
     if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
@@ -1355,7 +1399,7 @@ sampleTrack.el.addEventListener('drop',e=>{
     const d=sampleTrack.dur,len=state.selEnd-state.selStart,st=d*(e.shiftKey?.05:.01)*(e.key==='ArrowLeft'?-1:1);
     const s=clamp(state.selStart+st,0,d-len);
     state.selStart=s;state.selEnd=s+len;syncSel();
-    clearTimeout(keyT);keyT=setTimeout(preview,350);
+    clearTimeout(keyT);keyT=setTimeout(()=>preview(),350);
   });
   sampleTrack.el.addEventListener('change',e=>{
     if(e.target.name!=='playmode')return;
@@ -1396,10 +1440,8 @@ readHash(true);
 requestAnimationFrame(drawWave);
 })();
 </script>
-<!--
-  Cloudflare Web Analytics. To turn it on, replace YOUR_CLOUDFLARE_TOKEN with your site token
-  (Cloudflare dashboard > Analytics & Logs > Web Analytics > your site > Manage site), then remove the comment markers.
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "YOUR_CLOUDFLARE_TOKEN"}'></script>
--->
+<!-- Cloudflare Web Analytics -->
+<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "78332a5935f046d48771d30750527c14"}'></script>
+<!-- End Cloudflare Web Analytics -->
 </body>
 </html>
