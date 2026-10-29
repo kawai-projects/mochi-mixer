@@ -56,7 +56,7 @@ GitHub CLI signs Terminal in once and remembers it, including accounts that use 
 The site already has a page title and description, a canonical link, social preview tags (Facebook, X, WhatsApp, Slack and others use `preview.png`), structured data that describes it as a free web app, a `sitemap.xml` and a `robots.txt`.
 
 1. Go to https://search.google.com/search-console and choose Add property, then "URL prefix", and enter `https://kawai-projects.github.io/mochi-mixer/`.
-2. Verify it with the "HTML tag" method. Copy the `<meta name="google-site-verification" ...>` tag and paste it into the `<head>` of `index.html`, where the comment says so. Publish, then press Verify.
+2. Verify it with the "HTML tag" method. Copy the `<meta name="google-site-verification" ...>` tag and paste it into the `<head>` of `index.html`. It is already there for this site. Publish, then press Verify.
 3. In Search Console open Sitemaps and submit `sitemap.xml`.
 4. Open URL Inspection, paste the site address and press "Request indexing".
 5. Indexing takes days to a few weeks. Links from other sites help most, so share the site and link to it from your GitHub profile.
